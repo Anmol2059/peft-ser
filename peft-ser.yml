@@ -196,4 +196,5 @@ dependencies:
     - transformers==4.30.2
     - triton==2.0.0
     - whisper==1.1.10
-prefix: /home1/tiantiaf/.conda/envs/efficient-ser
+prefix: /home/stu/anaconda3/envs/efficient-ser
+

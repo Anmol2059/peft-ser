@@ -27,7 +27,7 @@ from utils import parse_finetune_args, set_seed, log_epoch_result, log_best_resu
 # from utils
 from wav2vec import Wav2VecWrapper
 from wavlm_plus import WavLMWrapper
-from whisper import WhisperWrapper
+from model.whisper import WhisperWrapper
 from evaluation import EvalMetric
 from dataloader import load_finetune_audios, set_finetune_dataloader, return_weights
 

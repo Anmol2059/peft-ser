@@ -94,16 +94,20 @@ class EmotionDatasetGenerator(Dataset):
     def __getitem__(
         self, item
     ):
-        # Read original speech in dev
-        data, _ = torchaudio.load(self.data_list[item][3])
-        data = data[0]
-        if data.isnan()[0].item(): data = torch.zeros(data.shape)
-        if len(data) > self.audio_duration*16000: data = data[:self.audio_duration*16000]
-        if self.is_train:
-            data = data.detach().cpu().numpy()
-            data = self.transform(samples=data, sample_rate=16000)
-            data = torch.tensor(data)
-        return data, self.data_list[item][-1]
+        try:
+            # Read original speech in dev
+            data, _ = torchaudio.load(self.data_list[item][3])
+            data = data[0]
+            if data.isnan()[0].item(): data = torch.zeros(data.shape)
+            if len(data) > self.audio_duration*16000: data = data[:self.audio_duration*16000]
+            if self.is_train:
+                data = data.detach().cpu().numpy()
+                data = self.transform(samples=data, sample_rate=16000)
+                data = torch.tensor(data)
+            return data, self.data_list[item][-1]
+        except RuntimeError as e:
+            print(f"Failed to load file {self.data_list[item][3]}: {e}")
+            return None
 
     def _padding_cropping(
         self, input_wav, size

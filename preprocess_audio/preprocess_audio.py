@@ -5,6 +5,7 @@ import torchaudio
 import numpy as np
 import pandas as pd
 import pickle, pdb, re, argparse
+from os.path import isfile
 
 from tqdm import tqdm
 from pathlib import Path
@@ -48,11 +49,28 @@ if __name__ == '__main__':
         Path.mkdir(audio_path.joinpath(args.dataset), parents=True, exist_ok=True)
         for idx in tqdm(range(len(split_dict[split]))):
             # Read data: speaker_id, path
+            # data = split_dict[split][idx]
+            # speaker_id, file_path = data[1], data[3]
+
+            # # Read wavforms
+            # waveform, sample_rate = torchaudio.load(str(file_path))
             data = split_dict[split][idx]
             speaker_id, file_path = data[1], data[3]
 
+            # Check if the file exists and is a valid audio file
+            if not isfile(file_path):
+                logging.error(f'File {file_path} does not exist.')
+                continue
+            if not file_path.endswith('.wav'):
+                logging.error(f'File {file_path} is not a valid .wav audio file.')
+                continue
+
             # Read wavforms
-            waveform, sample_rate = torchaudio.load(str(file_path))
+            try:
+                waveform, sample_rate = torchaudio.load(str(file_path))
+            except RuntimeError as e:
+                logging.error(f'Failed to load file {file_path}: {str(e)}')
+                continue
 
             # If the waveform has multiple channels, compute the mean across channels to create a single-channel waveform.
             if waveform.shape[0] != 1:
