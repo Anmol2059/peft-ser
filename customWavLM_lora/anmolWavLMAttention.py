@@ -1,5 +1,21 @@
+import loralib as lora
+import torch
+from torch import nn
+import argparse
+from transformers import WavLMModel
 
-class WavLMAttention(nn.Module):
+import math
+import warnings
+from typing import Optional, Tuple, Union
+
+import numpy as np
+import torch
+import torch.nn.functional as F
+import torch.utils.checkpoint
+from torch import nn
+from torch.nn import CrossEntropyLoss
+
+class CustomWavLMAttention(nn.Module):
     """Multi-headed attention from 'Attention Is All You Need' paper"""
 
     def __init__(
@@ -10,8 +26,8 @@ class WavLMAttention(nn.Module):
         num_buckets: int = 320,
         max_distance: int = 800,
         has_relative_position_bias: bool = True,
-        lora_dim: int = 256,  # anmol changed dimension of the LORA layer
-        lora_rank: int =32, #anmol changed rank of the LORA layer
+        lora_dim: int = 768,  # changed dimension of the LORA layer
+        lora_rank: int =32, #changed rank of the LORA layer
     ):
         super().__init__()
         self.embed_dim = embed_dim
@@ -104,7 +120,7 @@ class WavLMAttention(nn.Module):
 
         # PyTorch 1.3.0 has F.multi_head_attention_forward defined
         # so no problem with backwards compatibility
-        #anmol changed attn_output as attn_output_linear and attention_weights as attn_weights_linear
+        #changed attn_output as attn_output_linear and attention_weights as attn_weights_linear
         attn_output_linear, attn_weights_linear = F.multi_head_attention_forward(
             query,
             key,
@@ -128,7 +144,7 @@ class WavLMAttention(nn.Module):
             k_proj_weight=self.k_proj.weight,
             v_proj_weight=self.v_proj.weight,
         )
-        #anmol changed
+        #changed
         # Pass kqv through LORA layers
         query_lora = self.lora_intermediate(query)
         key_lora = self.lora_intermediate(key)
@@ -158,7 +174,12 @@ class WavLMAttention(nn.Module):
         )
         # Add the outputs of the linear and LORA layers
         attn_output = attn_output_linear + attn_output_lora
-        attn_weights = attn_weights_linear + attn_weights_lora
+
+        if attn_weights_linear is not None and attn_weights_lora is not None:
+            attn_weights = attn_weights_linear + attn_weights_lora
+        else:
+            attn_weights = None
+            print("One or both of the attention weights are None")
 
 
         # [Seq_Len, Batch Size, ...] -> [Batch Size, Seq_Len, ...]

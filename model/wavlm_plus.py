@@ -251,6 +251,13 @@ if __name__ == '__main__':
         type=int, 
         help='adapter dimension'
     )
+    # anmol changed
+    parser.add_argument(
+        '--lora_rank', 
+        default=1,  # or any default value you want
+        type=int, 
+        help='LoRA rank'
+    )
     
     args = parser.parse_args()
     model = WavLMWrapper(args)

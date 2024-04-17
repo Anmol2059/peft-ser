@@ -1,14 +1,15 @@
 import torch
 import argparse
 from torch import nn
-import transformers_models_wavlm as wavlm
+import transformers.models.wavlm.modeling_wavlm as wavlm
 import loralib as lora
 from transformers import WavLMModel
+from anmolWavLMAttention import CustomWavLMAttention
 
 class WavLMEncoderLayer(nn.Module):
     def __init__(self, config, has_relative_position_bias: bool = True):
         super().__init__()
-        self.attention = wavlm.WavLMAttention(
+        self.attention = CustomWavLMAttention(
             embed_dim=config.hidden_size,
             num_heads=config.num_attention_heads,
             dropout=config.attention_dropout,
@@ -83,6 +84,6 @@ if __name__ == '__main__':
     parser.add_argument('--lora_rank', default=32, type=int, help='LoRA rank')
     args = parser.parse_args()
     model = WavLMWrapper(args)
-    data = torch.zeros([1, 16000])
+    data = torch.zeros([1, 32000])
     output = model(data)
     print(output.shape)
