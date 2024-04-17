@@ -152,6 +152,7 @@ if __name__ == '__main__':
     args.split_dir  = str(Path(config["project_dir"]).joinpath("train_split"))
     args.data_dir   = str(Path(config["project_dir"]).joinpath("audio"))
     args.log_dir    = str(Path(config["project_dir"]).joinpath("finetune"))
+    # print(args)
 
     # Find device
     device = torch.device("cuda") if torch.cuda.is_available() else "cpu"
@@ -160,13 +161,13 @@ if __name__ == '__main__':
     best_dict = dict()
     if args.dataset == "msp-improv": total_folds = 7
     elif args.dataset == "msp-podcast": total_folds = 4
-    else: total_folds = 6
+    else: total_folds = 5
     # We perform 5 folds (6 folds only on msp-improv data with 6 sessions)
     for fold_idx in range(1, total_folds):
 
         # Read train/dev file list
         train_file_list, dev_file_list, test_file_list = load_finetune_audios(
-            args.split_dir, audio_path=args.data_dir, dataset=args.dataset, fold_idx=fold_idx
+            input_path=args.split_dir, audio_path=args.data_dir, dataset=args.dataset, fold_idx=fold_idx
         )
         # Read weights of training data
         weights = return_weights(
