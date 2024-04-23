@@ -7,6 +7,7 @@ import torchaudio
 import numpy as np
 import pandas as pd
 import pickle, pdb, re
+import os
 
 from tqdm import tqdm
 from pathlib import Path
@@ -275,6 +276,8 @@ def load_finetune_audios(
     :param fold_idx:    Fold idx
     :return train_file_list, dev_file_list: train, dev, and test file list
     """
+
+    
     train_file_list, dev_file_list, test_file_list = list(), list(), list()
     if dataset in ["iemocap_impro"]:
         with open(str(Path(input_path).joinpath(f'iemocap_fold{fold_idx}.json')), "r") as f: split_dict = json.load(f)
@@ -288,6 +291,7 @@ def load_finetune_audios(
     for split in ['train', 'dev', 'test']:
         for data in split_dict[split]:
             # pdb.set_trace()
+            
             if include_for_finetune(data, dataset):
                 data[-1] = map_label(data, dataset)
                 if dataset == "iemocap_impro" and "impro" not in data[0]: continue
@@ -470,7 +474,7 @@ def set_finetune_dataloader(
         if is_train:
             dataloader = DataLoader(
                 data_generator, 
-                batch_size=32, 
+                batch_size=16, 
                 num_workers=6, 
                 shuffle=is_train,
                 collate_fn=collate_fn,

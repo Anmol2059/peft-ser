@@ -16,7 +16,7 @@ logging.basicConfig(
 if __name__ == '__main__':
 
     # Read data path
-    with open("../config/config.yml", "r") as stream:
+    with open("/home/stu/Documents/peft-ser/config/config.yml", "r") as stream:
         config = yaml.safe_load(stream)
     data_path   = Path(config["data_dir"]["crema_d"])
     split_path = Path(config["project_dir"]).joinpath("train_split")

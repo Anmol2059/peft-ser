@@ -9,6 +9,7 @@ import numpy as np
 import loralib as lora
 import transformers.models.wav2vec2.modeling_wav2vec2 as w2v2
 import transformers.models.wavlm.modeling_wavlm as wavlm
+# from transformers_models_wavlm import WavLMAttention, WavLMFeedForward
 
 from functools import lru_cache
 from torchaudio.compliance import kaldi
@@ -20,11 +21,13 @@ from typing import Optional, Callable
 from torch.nn import functional as F
 from torch.nn.functional import normalize
 from transformers import Wav2Vec2Model, Wav2Vec2Config, Wav2Vec2Processor, AutoProcessor, WavLMModel, WhisperModel, AutoFeatureExtractor
+from anmolWavLMAttention import CustomWavLMAttention
 
 class WavLMEncoderLayer(nn.Module):
     def __init__(self, config, has_relative_position_bias: bool = True):
         super().__init__()
-        self.attention = wavlm.WavLMAttention(
+        #changed this and implemented custom
+        self.attention = CustomWavLMAttention(
             embed_dim=config.hidden_size,
             num_heads=config.num_attention_heads,
             dropout=config.attention_dropout,
@@ -254,7 +257,7 @@ if __name__ == '__main__':
     # anmol changed
     parser.add_argument(
         '--lora_rank', 
-        default=1,  # or any default value you want
+        default=32,  # or any default value you want
         type=int, 
         help='LoRA rank'
     )
