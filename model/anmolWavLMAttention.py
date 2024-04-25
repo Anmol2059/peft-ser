@@ -18,6 +18,10 @@ import torch.utils.checkpoint
 from torch import nn
 from torch.nn import CrossEntropyLoss
 
+from AnmolMultiHeadAttentionForward import anmol_multi_head_attention_forward
+
+
+
 class CustomWavLMAttention(nn.Module):
     """Multi-headed attention from 'Attention Is All You Need' paper"""
 
@@ -108,6 +112,11 @@ class CustomWavLMAttention(nn.Module):
         )
 
         return attn_output, attn_weights, position_bias
+    # implemented custom_multi_head_attention_forward
+    
+
+
+    #till here
 
     def torch_multi_head_self_attention(
         self,
@@ -137,7 +146,7 @@ class CustomWavLMAttention(nn.Module):
         key = key_linear + key_lora
         value = value_linear + value_lora
 
-        attn_output, attn_weights = F.multi_head_attention_forward(
+        attn_output, attn_weights = anmol_multi_head_attention_forward(
             query,
             key,
             value,
